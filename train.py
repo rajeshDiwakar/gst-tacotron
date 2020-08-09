@@ -3,6 +3,8 @@ from datetime import datetime
 import math
 import numpy as np
 import os
+import glob
+import time
 import subprocess
 import time
 import tensorflow as tf
@@ -138,8 +140,8 @@ def train(log_dir, args):
         step, loss, opt = sess.run([global_step, model.loss, model.optimize])
         time_window.append(time.time() - start_time)
         loss_window.append(loss)
-        message = 'Step %-7d [%.03f sec/step, loss=%.05f, avg_loss=%.05f]' % (
-          step, time_window.average, loss, loss_window.average)
+        message = '%s |Step %-7d [%.03f sec/step, loss=%.05f, avg_loss=%.05f]' % (
+          time.asctime(), step, time_window.average, loss, loss_window.average)
         log(message, slack=(step % args.checkpoint_interval == 0))
 
         if loss > 100 or math.isnan(loss):
