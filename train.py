@@ -25,13 +25,16 @@ if not os.path.isfile('mycreds.txt'):
     with open('mycreds.txt','w') as f:
         f.write('{"access_token": "ya29.a0AfH6SMC_aOt4BLq-OQ1oN4txyT5Guk9KMeEzqYJDjo4AkqD0fMJnIdQm4TGz3PQit8qNa-QEg3hdg66ic2pLErifxwsEhgPP-MIa947Ayigh8c5czN64T9IxCyLkR2M-5ygdjOhV5OzuXw-O6LfBJG9vBwMkyg9OKL0", "client_id": "883051571054-2e0bv2mjqra6i3cd6c915hkjgtdutct0.apps.googleusercontent.com", "client_secret": "NmzemQWSeUm_WWTbmUJi5xt7", "refresh_token": "1//0gE7zkyCPJ4RpCgYIARAAGBASNwF-L9IrISJx8AG8doLKF1C8RMbuvkqS6BsxGXaYJfqlB-RbrtmIESmVIA2krp-rK-Ylm26klmU", "token_expiry": "2020-07-29T16:47:41Z", "token_uri": "https://oauth2.googleapis.com/token", "user_agent": null, "revoke_uri": "https://oauth2.googleapis.com/revoke", "id_token": null, "id_token_jwt": null, "token_response": {"access_token": "ya29.a0AfH6SMC_aOt4BLq-OQ1oN4txyT5Guk9KMeEzqYJDjo4AkqD0fMJnIdQm4TGz3PQit8qNa-QEg3hdg66ic2pLErifxwsEhgPP-MIa947Ayigh8c5czN64T9IxCyLkR2M-5ygdjOhV5OzuXw-O6LfBJG9vBwMkyg9OKL0", "expires_in": 3599, "refresh_token": "1//0gE7zkyCPJ4RpCgYIARAAGBASNwF-L9IrISJx8AG8doLKF1C8RMbuvkqS6BsxGXaYJfqlB-RbrtmIESmVIA2krp-rK-Ylm26klmU", "scope": "https://www.googleapis.com/auth/drive", "token_type": "Bearer"}, "scopes": ["https://www.googleapis.com/auth/drive"], "token_info_uri": "https://oauth2.googleapis.com/tokeninfo", "invalid": false, "_class": "OAuth2Credentials", "_module": "oauth2client.client"}')
 
+        # {"access_token": "ya29.a0AfH6SMCDGn8XAOVlzeT47aIMf7QlauIfWz3G9fXrRTyX0JgSllcpHrAIuj6s6zqNTI0kK46c4LmVQp2svHpCSltdQrSgLo-74UtFWv4mdUX0Rnt5TxM7I_OaewjmLl6vH8wmrk1bccDAWBY_-vTeBI-eEedfSNRQu4Mc", "client_id": "883051571054-2e0bv2mjqra6i3cd6c915hkjgtdutct0.apps.googleusercontent.com", "client_secret": "NmzemQWSeUm_WWTbmUJi5xt7", "refresh_token": "1//0gE7zkyCPJ4RpCgYIARAAGBASNwF-L9IrISJx8AG8doLKF1C8RMbuvkqS6BsxGXaYJfqlB-RbrtmIESmVIA2krp-rK-Ylm26klmU", "token_expiry": "2020-08-09T09:46:00Z", "token_uri": "https://oauth2.googleapis.com/token", "user_agent": null, "revoke_uri": "https://oauth2.googleapis.com/revoke", "id_token": null, "id_token_jwt": null, "token_response": {"access_token": "ya29.a0AfH6SMCDGn8XAOVlzeT47aIMf7QlauIfWz3G9fXrRTyX0JgSllcpHrAIuj6s6zqNTI0kK46c4LmVQp2svHpCSltdQrSgLo-74UtFWv4mdUX0Rnt5TxM7I_OaewjmLl6vH8wmrk1bccDAWBY_-vTeBI-eEedfSNRQu4Mc", "expires_in": 3599, "scope": "https://www.googleapis.com/auth/drive", "token_type": "Bearer"}, "scopes": ["https://www.googleapis.com/auth/drive"], "token_info_uri": "https://oauth2.googleapis.com/tokeninfo", "invalid": false, "_class": "OAuth2Credentials", "_module": "oauth2client.client"}
+
+
 gauth = GoogleAuth()
 # Try to load saved client credentials
 gauth.LoadCredentialsFile("mycreds.txt")
-if gauth.credentials is None:
-    # Authenticate if they're not there
-    gauth.LocalWebserverAuth()
-elif gauth.access_token_expired:
+# if gauth.credentials is None:
+#     # Authenticate if they're not there
+#     gauth.LocalWebserverAuth()
+if gauth.access_token_expired:
     # Refresh them if expired
     gauth.Refresh()
 else:
@@ -40,7 +43,29 @@ else:
 # Save the current credentials to a file
 gauth.SaveCredentialsFile("mycreds.txt")
 
-drive = GoogleDrive(gauth)
+# drive = GoogleDrive(gauth)
+
+def authorize_drive():
+    # global drive
+    global gauth
+    # Try to load saved client credentials
+    gauth.LoadCredentialsFile("mycreds.txt")
+    # if gauth.credentials is None:
+    #     # Authenticate if they're not there
+    #     gauth.LocalWebserverAuth()
+    if gauth.access_token_expired:
+        # Refresh them if expired
+        gauth.Refresh()
+    else:
+        # Initialize the saved creds
+        gauth.Authorize()
+    # Save the current credentials to a file
+    gauth.SaveCredentialsFile("mycreds.txt")
+
+    drive = GoogleDrive(gauth)
+
+    return drive
+
 
 # def validate_parent_id(parent_id):
 #     global drive
@@ -52,13 +77,52 @@ drive = GoogleDrive(gauth)
 
 
 def upload_to_drive(list_files,parent_id):
-    global drive
+    # global drive
+    drive = authorize_drive()
     # parent_id = ''# parent id
     for path in list_files:
         d,f = os.path.split(path)
         file = drive.CreateFile({'title': f, 'parents': [{'id': parent_id}]})
         file.SetContentFile(path)
         file.Upload()
+
+def download_checkpoints(parent_id,root_dir='logs-tacotron'):
+    drive = authorize_drive()
+    downloaded_files = []
+    os.makedirs(root_dir,exist_ok=True)
+    # checkpoint = ''
+    # file_list = drive.ListFile({'q': "title contains 'My Awesome File' and trashed=false"}).GetList()
+    ckpt_path = os.path.join(root_dir,'checkpoint')
+    file_list = drive.ListFile({'q': "'%s' in parents and trashed=false"%parent_id}).GetList()  #check if it is iterator
+    # print(file_list)
+    for f in file_list:
+        if f['title'].lower() == 'checkpoint':
+            file_id = f['id']
+            file = drive.CreateFile({'id': file_id})
+            file.GetContentFile(ckpt_path)
+            downloaded_files.append(ckpt_path)
+        elif f['title'].startswith('events'):
+            file_id = f['id']
+            file = drive.CreateFile({'id': file_id})
+            file.GetContentFile(os.path.join(root_dir,f['title']))
+            downloaded_files.append(os.path.join(root_dir,f['title']))
+
+    if os.path.isfile(ckpt_path):
+        with open(ckpt_path) as f:
+            ckpt_data = f.read().split('\n')
+        if len(ckpt_data):
+            ckpt_data = ckpt_data[0].split(':')[-1].strip().strip('" ')
+            weight_name = os.path.basename(ckpt_data)
+            for f in file_list:
+                if f['title'].startswith(weight_name):
+                    file_id = f['id']
+                    file = drive.CreateFile({'id': file_id})
+                    file.GetContentFile(os.path.join(root_dir,f['title']))
+                    downloaded_files.append(os.path.join(root_dir,f['title']))
+    else:
+        log('checkpoint file not found in drive')
+
+    print('Downloaded following files\n%s'%'\n'.join(downloaded_files))
 
 
 
@@ -99,6 +163,9 @@ def train(log_dir, args):
   log('Using model: %s' % args.model)
   log(hparams_debug_string())
 
+  if parent_id:
+      log('Downloading model files from drive')
+      download_checkpoints(parent_id)
   # Set up DataFeeder:
   coord = tf.train.Coordinator()
   with tf.variable_scope('datafeeder') as scope:
@@ -156,7 +223,7 @@ def train(log_dir, args):
           list_files = [] #files to be uploaded to drive
           log('Saving checkpoint to: %s-%d' % (checkpoint_path, step))
           prefix = saver.save(sess, checkpoint_path, global_step=step)
-          list_files.extend(glob.glob(prefix+'.'))
+          list_files.extend(glob.glob(prefix+'.*'))
           log('Saving audio and alignment...')
           input_seq, spectrogram, alignment = sess.run([
             model.inputs[0], model.linear_outputs[0], model.alignments[0]])
@@ -174,8 +241,9 @@ def train(log_dir, args):
               except Exception as e:
                   print(e)
                   with open('drive_log.txt','a') as ferr:
-                      ferr.write(', '.join(list_files))
-                      ferr.write(str(e))
+                      ferr.write('\n\n\n'+time.asctime())
+                      ferr.write('\n'+', '.join(list_files))
+                      ferr.write('\n'+str(e))
 
 
 
