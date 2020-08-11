@@ -110,7 +110,7 @@ def download_checkpoints(parent_id,root_dir='logs-tacotron'):
             file.GetContentFile(ckpt_path)
             downloaded_files.append(ckpt_path)
         elif 0 and f['title'].startswith('events'):
-            file_id = f['id']
+            file_id = f['id'] 
             file = drive.CreateFile({'id': file_id})
             file.GetContentFile(os.path.join(root_dir,f['title']))
             downloaded_files.append(os.path.join(root_dir,f['title']))
