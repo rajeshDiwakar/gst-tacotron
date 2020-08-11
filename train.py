@@ -88,7 +88,7 @@ def upload_to_drive(list_files,parent_id):
         d,f = os.path.split(path)
         # check if file already exists and trash it
         if f in drive_files:
-                drive_files[f].trash()
+                drive_files[f].Trash()
         
         file = drive.CreateFile({'title': f, 'parents': [{'id': parent_id}]})
         file.SetContentFile(path)
