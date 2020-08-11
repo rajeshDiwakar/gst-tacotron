@@ -9,6 +9,7 @@ import subprocess
 import time
 import tensorflow as tf
 import traceback
+import textwrap
 
 from datasets.datafeeder import DataFeeder
 from hparams import hparams, hparams_debug_string
@@ -228,9 +229,10 @@ def train(log_dir, args):
           input_seq, spectrogram, alignment = sess.run([
             model.inputs[0], model.linear_outputs[0], model.alignments[0]])
           waveform = audio.inv_spectrogram(spectrogram.T)
+          info = '\n'.join(textwrap.wrap( '%s, %s, %s, %s, step=%d, loss=%.5f' % (sequence_to_text(input_seq), args.model, commit, time_string(), step, loss),70, break_long_words=False) )
           audio.save_wav(waveform, os.path.join(log_dir, 'step-%d-audio.wav' % step))
           plot.plot_alignment(alignment, os.path.join(log_dir, 'step-%d-align.png' % step),
-            info='%s, %s, %s, step=%d, loss=%.5f' % (args.model, commit, time_string(), step, loss))
+            info=info)
           log('Input: %s' % sequence_to_text(input_seq))
 
           list_files.append(os.path.join(log_dir, 'step-%d-audio.wav' % step))
