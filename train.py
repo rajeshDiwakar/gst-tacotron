@@ -81,8 +81,15 @@ def upload_to_drive(list_files,parent_id):
     # global drive
     drive = authorize_drive()
     # parent_id = ''# parent id
+    drive_files = drive.ListFile({'q': "'%s' in parents and trashed=false"%parent_id}).GetList()
+    drive_files = {f['title']:f for f in drive_files}
     for path in list_files:
+        if not os.path.isfile(path): continue
         d,f = os.path.split(path)
+        # check if file already exists and trash it
+        if f in drive_files:
+                drive_files[f].trash()
+        
         file = drive.CreateFile({'title': f, 'parents': [{'id': parent_id}]})
         file.SetContentFile(path)
         file.Upload()
@@ -221,10 +228,11 @@ def train(log_dir, args):
           summary_writer.add_summary(sess.run(stats), step)
 
         if step % args.checkpoint_interval == 0:
-          list_files = [] #files to be uploaded to drive
+          list_files = [os.path.join(log_dir,'checkpoint'), os.path.join(log_dir,'train.log') ] #files to be uploaded to drive
           log('Saving checkpoint to: %s-%d' % (checkpoint_path, step))
           prefix = saver.save(sess, checkpoint_path, global_step=step)
           list_files.extend(glob.glob(prefix+'.*'))
+          list_files.extend(glob.glob(os.path.join(log_dir,'events.*'))
           log('Saving audio and alignment...')
           input_seq, spectrogram, alignment = sess.run([
             model.inputs[0], model.linear_outputs[0], model.alignments[0]])
