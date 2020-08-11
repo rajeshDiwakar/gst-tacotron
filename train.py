@@ -232,7 +232,7 @@ def train(log_dir, args):
           log('Saving checkpoint to: %s-%d' % (checkpoint_path, step))
           prefix = saver.save(sess, checkpoint_path, global_step=step)
           list_files.extend(glob.glob(prefix+'.*'))
-          list_files.extend(glob.glob(os.path.join(log_dir,'events.*'))
+          list_files.extend(glob.glob(os.path.join(log_dir,'events.*')))
           log('Saving audio and alignment...')
           input_seq, spectrogram, alignment = sess.run([
             model.inputs[0], model.linear_outputs[0], model.alignments[0]])
