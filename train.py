@@ -233,18 +233,22 @@ def train(log_dir, args):
           prefix = saver.save(sess, checkpoint_path, global_step=step)
           list_files.extend(glob.glob(prefix+'.*'))
           list_files.extend(glob.glob(os.path.join(log_dir,'events.*')))
-          log('Saving audio and alignment...')
-          input_seq, spectrogram, alignment = sess.run([
-            model.inputs[0], model.linear_outputs[0], model.alignments[0]])
-          waveform = audio.inv_spectrogram(spectrogram.T)
-          info = '\n'.join(textwrap.wrap( '%s, %s, %s, %s, step=%d, loss=%.5f' % (sequence_to_text(input_seq), args.model, commit, time_string(), step, loss),70, break_long_words=False) )
-          audio.save_wav(waveform, os.path.join(log_dir, 'step-%d-audio.wav' % step))
-          plot.plot_alignment(alignment, os.path.join(log_dir, 'step-%d-align.png' % step),
-            info=info)
-          log('Input: %s' % sequence_to_text(input_seq))
+          try:
+                  log('Saving audio and alignment...')
+                  input_seq, spectrogram, alignment = sess.run([
+                    model.inputs[0], model.linear_outputs[0], model.alignments[0]])
+                  waveform = audio.inv_spectrogram(spectrogram.T)
+                  info = '\n'.join(textwrap.wrap( '%s, %s, %s, %s, step=%d, loss=%.5f' % (sequence_to_text(input_seq), args.model, commit, time_string(), step, loss),70, break_long_words=False) )
+                  audio.save_wav(waveform, os.path.join(log_dir, 'step-%d-audio.wav' % step))
+                  plot.plot_alignment(alignment, os.path.join(log_dir, 'step-%d-align.png' % step),
+                    info=info)
+                  log('Input: %s' % sequence_to_text(input_seq))
 
-          list_files.append(os.path.join(log_dir, 'step-%d-audio.wav' % step))
-          list_files.append(os.path.join(log_dir, 'step-%d-align.png' % step))
+                  list_files.append(os.path.join(log_dir, 'step-%d-audio.wav' % step))
+                  list_files.append(os.path.join(log_dir, 'step-%d-align.png' % step))
+          except Exception as e:
+                log(str(e))
+                print(e)
           if parent_id:
               try:
                   upload_to_drive(list_files,parent_id)
