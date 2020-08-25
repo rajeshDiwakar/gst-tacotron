@@ -12,10 +12,10 @@ import textwrap
 class Synthesizer:
   def __init__(self, teacher_forcing_generating=False):
     self.teacher_forcing_generating = teacher_forcing_generating
-  def load(self, checkpoint_path, reference_mel=None, model_name='tacotron'):
+  def load(self, checkpoint_path, reference_mel=None, style_path=None, model_name='tacotron'):
     print('Constructing model: %s' % model_name)
     inputs = tf.placeholder(tf.int32, [1, None], 'inputs')
-    input_lengths = tf.placeholder(tf.int32, [1], 'input_lengths') 
+    input_lengths = tf.placeholder(tf.int32, [1], 'input_lengths')
     if reference_mel is not None:
       reference_mel = tf.placeholder(tf.float32, [1, None, hparams.num_mels], 'reference_mel')
     # Only used in teacher-forcing generating mode
@@ -24,11 +24,17 @@ class Synthesizer:
     else:
       mel_targets = None
 
+    if style_path is not None:
+        style_embeddings = np.load(style_path)
+    else:
+        style_embeddings = None
+
     with tf.variable_scope('model') as scope:
       self.model = create_model(model_name, hparams)
-      self.model.initialize(inputs, input_lengths, mel_targets=mel_targets, reference_mel=reference_mel)
+      self.model.initialize(inputs, input_lengths, mel_targets=mel_targets, reference_mel=reference_mel,feed_style_embeddings=style_embeddings)
       self.wav_output = audio.inv_spectrogram_tensorflow(self.model.linear_outputs[0])
       self.alignments = self.model.alignments[0]
+      self.style_embeddings = self.model.style_embeddings_
 
     print('Loading checkpoint: %s' % checkpoint_path)
     self.session = tf.Session()
@@ -37,7 +43,7 @@ class Synthesizer:
     saver.restore(self.session, checkpoint_path)
 
 
-  def synthesize(self, text, mel_targets=None, reference_mel=None, alignment_path=None):
+  def synthesize(self, text, mel_targets=None, reference_mel=None, alignment_path=None, style_path=None):
     cleaner_names = [x.strip() for x in hparams.cleaners.split(',')]
     seq = text_to_sequence(text, cleaner_names)
     feed_dict = {
@@ -51,7 +57,10 @@ class Synthesizer:
       reference_mel = np.expand_dims(reference_mel, 0)
       feed_dict.update({self.model.reference_mel: np.asarray(reference_mel, dtype=np.float32)})
 
-    wav, alignments = self.session.run([self.wav_output, self.alignments], feed_dict=feed_dict)
+    if style_path is not None:
+        feed_dict.update({self.model.style_embeddings_:np.load(style_path)})
+
+    wav, alignments, style = self.session.run([self.wav_output, self.alignments, self.style_embeddings], feed_dict=feed_dict)
     wav = audio.inv_preemphasis(wav)
     end_point = audio.find_endpoint(wav)
     wav = wav[:end_point]
@@ -60,4 +69,7 @@ class Synthesizer:
     n_frame = int(end_point / (hparams.frame_shift_ms / 1000* hparams.sample_rate)) + 1
     text = '\n'.join(textwrap.wrap(text, 70, break_long_words=False))
     plot.plot_alignment(alignments[:,:n_frame], alignment_path, info='%s' % (text))
+
+    if style_path:
+        np.save(style_path, style)
     return out.getvalue()

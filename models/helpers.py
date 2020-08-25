@@ -77,7 +77,9 @@ class TacoTrainingHelper(Helper):
   def next_inputs(self, time, outputs, state, sample_ids, name=None):
     with tf.name_scope(name or 'TacoTrainingHelper'):
       finished = (time + 1 >= self._lengths)
+
       next_inputs = self._targets[:, time, :]
+      # next_inputs = tf.cond(time%20>0, lambda: outputs[:, -self._output_dim:], lambda: self._targets[:, time, :] )
       next_inputs = prenet(next_inputs, True, self._hp.prenet_depths, "decoder_prenet")
       return (finished, next_inputs, state)
 
@@ -85,4 +87,3 @@ class TacoTrainingHelper(Helper):
 def _go_frames(batch_size, output_dim):
   '''Returns all-zero <GO> frames for a given batch size and output dimension'''
   return tf.tile([[0.0]], [batch_size, output_dim])
-
