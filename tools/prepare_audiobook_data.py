@@ -45,7 +45,7 @@ BLOCKED_CHANNELS = ['UCOIu6fZOViBEgvhSYqka4GQ','UCZHso3FEeHMv9bNRMbNF9_w']
 
 def load_csv(file_path):
     with open(file_path) as csvfile:
-        dialect = csv.Sniffer().sniff(csvfile.read(1024))
+        dialect = csv.Sniffer().sniff(csvfile.read(10240))
         csvfile.seek(0)
         reader = csv.reader(csvfile, dialect)
         return [row for row in reader if len(row)] #(i,name,author,pdf_urls)
@@ -329,8 +329,8 @@ if __name__ == '__main__':
     #
     # booklist = '/home/rajesh/work/limbo/data/yt/500books_pdf.tsv'
     # audio_meta = '/home/rajesh/work/limbo/data/yt/500books_audio_meta_1-65.jsonl'
-    parser = argparse.ArguementParser()
+    parser = argparse.ArgumentParser()
     parser.add_argument('--booklist',required=True)
     parser.add_argument('--audio_meta',required=True)
-    args.=parser.parse_args()
+    args=parser.parse_args()
     run(args.booklist,args.audio_meta)
