@@ -1,5 +1,5 @@
 '''
-python prepare_audiobook_data.py --booklist goodreads/books_pdflog.tsv --audio_meta goodreads/books_pdflog_audio_meta_0-0.jsonl
+python prepare_audiobook_data.py --booklist goodreads/books_pdflog.tsv --audio_meta goodreads/books_pdflog_audio_meta_0-0.jsonl --start 0 --end 10
 
 sudo apt-get install libsox-fmt-mp3
 
@@ -228,17 +228,22 @@ class Status(object):
     def tostr(self,separator='|'):
         return '%s|%s|%s|%s|%s|%s|%s|%s|%s|%s'%(self.index,self.name,self.author,self.ispdf,self.istext,self.mp3,self.vtt2json,self.book_caption,self.numchunks,self.comment)
 
-def run(booklist,audio_meta,root='data'):
+def run(args):
 
+    booklist = args.booklist
+    audio_meta = args.audio_meta
+    root = args.root_dir
     logfile = os.path.splitext(booklist)[0]+'.log.csv'
     logfile = open(logfile,'a')
     os.makedirs(root,exist_ok=True)
     booklist = load_csv(booklist)
+    end = args.end if args.end >= 0 else len(booklist)
+    booklist = booklist[args.start,end]
     audio_meta = load_audio_meta(audio_meta)
     logging.info('number of books: %s'%len(booklist))
     logfile.write('index|name|author|ispdf|istext|mp3|vtt2json|book_caption|numchunks|comments\n')
 
-    for details in booklist[10:13]:
+    for details in booklist:
         mstatus = Status()
         try:
             i,name,author,pdf_urls = details[:4]
@@ -336,5 +341,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--booklist',required=True)
     parser.add_argument('--audio_meta',required=True)
+    parser.add_argument('--start',default=0,type=int,help='start index (including) of row to process(0 based)')
+    parser.add_argument('--end',default=-1,type=int,help='last index (excluding) of row to process(counting based not the given in the list)')
+    parser.add_argument('--root_dir',default='data',help='root directory path for all the data generated')
     args=parser.parse_args()
-    run(args.booklist,args.audio_meta)
+    run(args)
