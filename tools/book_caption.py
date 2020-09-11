@@ -48,7 +48,7 @@ def align_text(text_path, caption_path, new_caption_path=None,debug=False):
     # debug
     # text = text[:5000]
     # text = clean_text(text)
-    doc = nlp(text)
+    doc = nlp(text[:100000])
     # sents = list(doc.sents)
     text_tokens = [w for w in doc] # spacy's tokens
     text_words = [(i,w.text.lower()) for i,w in enumerate(text_tokens) if w.is_alpha] # text version of tokens

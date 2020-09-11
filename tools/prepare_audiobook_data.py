@@ -87,7 +87,6 @@ def get_bookdir(root,name):
 def download_first_pdf(urls,target):
     for url in urls:
         cmd = "wget --timeout=120 -O '%s' '%s'"%(target,url)
-        print(cmd)
         ret = os.system(cmd)
         if not ret:
             break
