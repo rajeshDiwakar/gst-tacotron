@@ -41,6 +41,7 @@ class Synthesizer:
     self.session.run(tf.global_variables_initializer())
     saver = tf.train.Saver()
     saver.restore(self.session, checkpoint_path)
+    self.style = np.array([])
 
 
   def synthesize(self, text, mel_targets=None, reference_mel=None, alignment_path=None, style_path=None):
@@ -57,19 +58,20 @@ class Synthesizer:
       reference_mel = np.expand_dims(reference_mel, 0)
       feed_dict.update({self.model.reference_mel: np.asarray(reference_mel, dtype=np.float32)})
 
-    if style_path is not None:
+    if reference_mel is None and style_path is not None:
         feed_dict.update({self.model.style_embeddings_:np.load(style_path)})
 
-    wav, alignments, style = self.session.run([self.wav_output, self.alignments, self.style_embeddings], feed_dict=feed_dict)
+    wav, alignments, self.style = self.session.run([self.wav_output, self.alignments, self.style_embeddings], feed_dict=feed_dict)
     wav = audio.inv_preemphasis(wav)
     end_point = audio.find_endpoint(wav)
     wav = wav[:end_point]
     out = io.BytesIO()
     audio.save_wav(wav, out)
-    n_frame = int(end_point / (hparams.frame_shift_ms / 1000* hparams.sample_rate)) + 1
-    text = '\n'.join(textwrap.wrap(text, 70, break_long_words=False))
-    plot.plot_alignment(alignments[:,:n_frame], alignment_path, info='%s' % (text))
+    if alignment_path is not None:
+        n_frame = int(end_point / (hparams.frame_shift_ms / 1000* hparams.sample_rate)) + 1
+        text = '\n'.join(textwrap.wrap(text, 70, break_long_words=False))
+        plot.plot_alignment(alignments[:,:n_frame], alignment_path, info='%s' % (text))
 
-    if style_path:
-        np.save(style_path, style)
+    if reference_mel is not None and style_path is not None:
+        np.save(style_path, self.style)
     return out.getvalue()

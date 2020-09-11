@@ -9,3 +9,16 @@ logs*
 database
 *.zip
 
+logs-tacotron
+mycreds.txt
+devlog
+myeval.py
+training
+
+
+data/*
+eval_live.py
+util/remove_slience.py
+.idea/*
+
+tools/data/*
