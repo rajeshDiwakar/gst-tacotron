@@ -238,7 +238,7 @@ def run(args):
     os.makedirs(root,exist_ok=True)
     booklist = load_csv(booklist)
     end = args.end if args.end >= 0 else len(booklist)
-    booklist = booklist[args.start,end]
+    booklist = booklist[args.start:end]
     audio_meta = load_audio_meta(audio_meta)
     logging.info('number of books: %s'%len(booklist))
     logfile.write('index|name|author|ispdf|istext|mp3|vtt2json|book_caption|numchunks|comments\n')
