@@ -1,4 +1,6 @@
 '''
+python prepare_audiobook_data.py --booklist goodreads/books_pdflog.tsv --audio_meta goodreads/books_pdflog_audio_meta_0-0.jsonl
+
 sudo apt-get install libsox-fmt-mp3
 
 
@@ -104,6 +106,7 @@ def download_audio_caption(vid,target_dir):
                             'writesubtitles':False,
                             'writeautomaticsub':True,
                             'write-sub':False,
+                            'quiet':True,
                             'subtitleslangs':['en'],
                             'format':'worstaudio',
                             'postprocessors': [{
