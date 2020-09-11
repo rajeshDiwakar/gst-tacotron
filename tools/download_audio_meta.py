@@ -61,18 +61,25 @@ def download_audio_meta(args):
             else:
                 print('Error: unexpected number of cols: %s'%str(row))
 
-    ydl = youtube_dl.YoutubeDL({
-                            'outtmpl': '%(title)s.%(ext)s',
-                            'write-auto-sub':True,
-                            'sub-lang':'en',
-                            'writesubtitles':True,
-                            'writeautomaticsub':True,
-                            'write-sub':True,
-                            'quiet':True,
-                            'no_warnings':True,
-                            'subtitleslangs':['en'],
-                            'ignoreerrors':True
-                                })
+    opts = {
+            'outtmpl': '%(title)s.%(ext)s',
+            'write-auto-sub':True,
+            'sub-lang':'en',
+            'writesubtitles':True,
+            'writeautomaticsub':True,
+            'write-sub':True,
+            'quiet':True,
+            'no_warnings':True,
+            'subtitleslangs':['en'],
+            'ignoreerrors':True,
+            'cookiefile':args.cookiefile
+            }
+    if args.sleep:
+        opts['sleep_interval'] = 5
+        opts['max_sleep_interval'] = 20
+
+
+    ydl = youtube_dl.YoutubeDL(opts)
 
     meta_file = os.path.splitext(file_path)[0]+'_audio_meta_%d-%d.jsonl'%(args.start,end)
     id_cache = []
@@ -93,6 +100,7 @@ def download_audio_meta(args):
             for item in tqdm(search_items):
                 try:
                     result = ydl.extract_info('ytsearch%d:%s'%(num_results, item), download=False)
+                    if not result:continue
                     query = {'query':item}
                     videos = []
                     if 'entries' in result:
@@ -119,6 +127,8 @@ def download_audio_meta(args):
                         continue
                 except Exception as e:
                     print(item,'\n',str(e))
+                except KeyboardInterrupt:
+                    break
 
 
 if __name__=='__main__':
@@ -131,5 +141,7 @@ if __name__=='__main__':
     parser.add_argument('--num_results',default=10,type=int,help='number of youtube videos to search')
     parser.add_argument('--nofemale',action='store_true',default=False,help='set to option to disable explicitly searching for female')
     parser.add_argument('--nomale',action='store_true',default=False,help='set to option to disable simple audiobook search (male search)')
+    parser.add_argument('--sleep',action='store_true',default=False,help='enable sleeping')
+    parser.add_argument('--cookiefile',default=None,help='path to cookiefile')
     args = parser.parse_args()
     download_audio_meta(args)

@@ -96,7 +96,7 @@ def download_first_pdf(urls,target):
     if not os.path.isfile(target):
         raise Exception('unable to fetch: %s'%str(urls))
 
-def download_audio_caption(vid,target_dir):
+def download_audio_caption(vid,target_dir,args):
     # raise NotImplemented
     url = 'http://www.youtube.com/watch?v='+vid
     ydl = youtube_dl.YoutubeDL({
@@ -114,6 +114,7 @@ def download_audio_caption(vid,target_dir):
                                         'key': 'FFmpegExtractAudio',
                                         'preferredcodec': 'mp3',
                                     }],
+                            'cookiefile':args.cookiefile
                                 })
     with ydl:
         ydl.download([url])
@@ -274,7 +275,7 @@ def run(args):
                 mono_audio_path = os.path.join(bookdir,vid['id']+'_mono.mp3')
                 if not os.path.isfile(audio_path):
                     # download caption and audio
-                    download_audio_caption(vid['id'],bookdir)
+                    download_audio_caption(vid['id'],bookdir,args)
                 if os.path.isfile(audio_path):
                     if not os.path.isfile(mono_audio_path):
                         convert_to_mono(audio_path, clean=False)
@@ -344,5 +345,6 @@ if __name__ == '__main__':
     parser.add_argument('--start',default=0,type=int,help='start index (including) of row to process(0 based)')
     parser.add_argument('--end',default=-1,type=int,help='last index (excluding) of row to process(counting based not the given in the list)')
     parser.add_argument('--root_dir',default='data',help='root directory path for all the data generated')
+    parser.add_argument('--cookiefile',default=None,help='path to cookiefile')
     args=parser.parse_args()
     run(args)
