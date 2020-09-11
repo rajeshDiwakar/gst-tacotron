@@ -1,6 +1,6 @@
 '''
 python download_audio_meta.py --booklist goodreads/books_pdflog.tsv \
-            --start 0 --end 10 --num_results 3 --nofemale
+            --start 0 --end 2 --num_results 3 --nofemale
 '''
 
 import os, sys
@@ -68,6 +68,8 @@ def download_audio_meta(args):
                             'writesubtitles':True,
                             'writeautomaticsub':True,
                             'write-sub':True,
+                            'quiet':True,
+                            'no_warnings':True,
                             'subtitleslangs':['en'],
                             'ignoreerrors':True
                                 })

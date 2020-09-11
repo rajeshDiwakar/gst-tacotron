@@ -107,6 +107,7 @@ def download_audio_caption(vid,target_dir):
                             'writeautomaticsub':True,
                             'write-sub':False,
                             'quiet':True,
+                            'no_warnings':True,
                             'subtitleslangs':['en'],
                             'format':'worstaudio',
                             'postprocessors': [{
