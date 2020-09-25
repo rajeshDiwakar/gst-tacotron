@@ -78,12 +78,20 @@ def align_text(text_path, caption_path, new_caption_path=None,debug=False):
         # debug alignment
         start_cap_id = None
         end_cap_id = None
+        start_text_i = None # spacy's index for text
+        end_text_i = None
         for token in sent:
             if not token.is_alpha: continue
             textword_index = index_texttoken2textword[token.i]
+            # end_text_i = index_texttoken2textword[token.i]
+
             # matched cap index
             capword_index = match_wordindex_text2cap.get(textword_index,None)
             if capword_index is not None:
+                end_text_i = token.i
+                if start_text_i is None:
+                    start_text_i = token.i
+
                 if start is None: start = captions[capword_index].start
                 end = captions[capword_index].end
 
@@ -91,11 +99,14 @@ def align_text(text_path, caption_path, new_caption_path=None,debug=False):
                 end_cap_id = capword_index
 
         sent_text = clean_text(sent.text)
+        text = str(doc[start_text_i:end_text_i+1] ) if start_text_i is not None else ''
         if start is None:
-            aligned_captions.append({"text":sent_text,'start':'00:00:00.000','end':'00:00:00.000','match':False})
+            aligned_captions.append({"text":'','start':'00:00:00.000','end':'00:00:00.000','match':False,'match_text':''})
             if debug: cprint('%s  --> ...'%sent_text,'red')
         else:
-            aligned_captions.append({"text":sent_text,'start':start,'end':end,'match':True})
+            match_text = ' '.join([w.text for w in captions[start_cap_id:end_cap_id+1]])
+            # aligned_captions.append({"text":text,'start':start,'end':end,'match':True,'sent_text':sent_text})
+            aligned_captions.append({"text":text,'start':start,'end':end,'match':True,'match_text':match_text})
             if debug: print('%s  -->  %s'%(colored(sent_text,'green'),' '.join([w.text for w in captions[start_cap_id:end_cap_id+1]])))
 
         if not new_caption_path:
@@ -116,4 +127,4 @@ if __name__ == '__main__':
         caption_path = sys.argv[2]
     # text_path = '/home/rajesh/work/limbo/data/yt/audiobooks/test.txt'
     # caption_path = '/home/rajesh/work/limbo/data/yt/audiobooks/test.json'
-    align_text(text_path,caption_path,None,True)
+    align_text(text_path,caption_path,None,False)

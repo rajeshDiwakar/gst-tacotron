@@ -77,7 +77,8 @@ def download_audio_meta(args):
     if args.sleep:
         opts['sleep_interval'] = 5
         opts['max_sleep_interval'] = 20
-
+    if args.ytverbose:
+        opts['verbose'] = True
 
     ydl = youtube_dl.YoutubeDL(opts)
 
@@ -143,5 +144,6 @@ if __name__=='__main__':
     parser.add_argument('--nomale',action='store_true',default=False,help='set to option to disable simple audiobook search (male search)')
     parser.add_argument('--sleep',action='store_true',default=False,help='enable sleeping')
     parser.add_argument('--cookiefile',default=None,help='path to cookiefile')
+    parser.add_argument('--ytverbose',default=False,action='store_true',help='ytverbose')
     args = parser.parse_args()
     download_audio_meta(args)

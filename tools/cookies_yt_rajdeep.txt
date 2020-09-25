@@ -1,0 +1,20 @@
+# HTTP Cookie File downloaded with cookies.txt by Genuinous @genuinous
+# This file can be used by wget, curl, aria2c and other standard compliant tools.
+# Usage Examples:
+#   1) wget -x --load-cookies cookies.txt "https://www.youtube.com/results?search_query=rajdeep+sardesai+interview&amp;sp=EgIYAg%253D%253D"
+#   2) curl --cookie cookies.txt "https://www.youtube.com/results?search_query=rajdeep+sardesai+interview&amp;sp=EgIYAg%253D%253D"
+#   3) aria2c --load-cookies cookies.txt "https://www.youtube.com/results?search_query=rajdeep+sardesai+interview&amp;sp=EgIYAg%253D%253D"
+#
+.youtube.com	TRUE	/	TRUE	1611306620	VISITOR_INFO1_LIVE	TGw4JNNl7YY
+.youtube.com	TRUE	/	TRUE	2146723200	CONSENT	YES+IN.en-GB+
+.youtube.com	TRUE	/	FALSE	1660979234	PREF	al=en&amp;f5=30000&amp;f6=400
+.youtube.com	TRUE	/	FALSE	1663668275	SID	1gcW10_po0xU_LX6GD43HQr0lEhbSS_Ip75Vof2UtI5wQW_pEGWiqMDZGCFzkpQaAy-AYQ.
+.youtube.com	TRUE	/	TRUE	1663668275	__Secure-3PSID	1gcW10_po0xU_LX6GD43HQr0lEhbSS_Ip75Vof2UtI5wQW_pGcyYeSksXWtFgXdZnIN0mQ.
+.youtube.com	TRUE	/	FALSE	1663668275	HSID	AtlxAMa_3lbyJOpCJ
+.youtube.com	TRUE	/	TRUE	1663668275	SSID	Av9QHY9uUF6KCmS0D
+.youtube.com	TRUE	/	FALSE	1663668275	APISID	f0Ia8KAEdP4dW9dr/ABTQzbL0zSm8EAyNA
+.youtube.com	TRUE	/	TRUE	1663668275	SAPISID	jlqVdAjchCss0PjK/AtFO7B0oij7k_GVAj
+.youtube.com	TRUE	/	TRUE	1663668275	__Secure-3PAPISID	jlqVdAjchCss0PjK/AtFO7B0oij7k_GVAj
+.youtube.com	TRUE	/	TRUE	1663668275	LOGIN_INFO	AFmmF2swRQIgB19xI95SoRA1hpij5AjNuqxDG2T3uW5ca_Q0Zo0FNFwCIQC2iyYWRdwBi-NYsDuEibf1mkTC1L8PcIvt8x0D8F_eKw:QUQ3MjNmeDVFTC0zMHAwMDNtZ3l0LTk0NkRqcXEzc1hyMmZmWU01STJ0YVlZb1dvS2F0X1Q2VzRFOXNiQWxnSHUzbnk1aUJLQmh2bjBUc2hXVWRHSGhwMndwbVJWNG1ETHo1djZSaHdud1ZxNExzM1R1enE2NDlDWnJiMUxKT0NReFJWWWE3eWtVaE52ZjZhb3RSLVF5dzBkbnpPVVFoVDh2RHNzUjJkQ2ZuV09Uc2FSMWVSLVBN
+.youtube.com	TRUE	/	FALSE	1632228441	SIDCC	AJi4QfH4PHHvqHpUU_6AQ8Z2euqr-Owt-VDhRxllvh8JxgOklz2Sp6MwIYnP-29SZ3LkQirj8A
+.youtube.com	TRUE	/	TRUE	1632228441	__Secure-3PSIDCC	AJi4QfFHlLfh-tsXHtX_VPxal1kD1s_Ivz15ATbiQbGWRc30CSWvYPnKDvu92_pXSYmpmTgQ
