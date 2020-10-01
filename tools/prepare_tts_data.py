@@ -1,5 +1,5 @@
 '''
-python prepare_tts_data.py --booklist hindi/booklist  --start 0 --trans_cache transliteration.cache.min3.man --data_dir tts
+python prepare_tts_data.py --booklist hindi/booklist_test  --start 0 --trans_cache transliteration.cache.min3.man --data_dir tts --augment rand_step
 
 sudo apt-get install libsox-fmt-mp3
 
@@ -460,7 +460,7 @@ def run(args):
 
                         audio_path = new_caption[:-len('.en.json')]+'_mono.mp3'
                         # print(audio_path)
-                        meta_csv = split_audio(audio_path,book_caption,root='%s/wavs'%bookdir,sr=22050,buffer=1800,augmentation=args.augment)
+                        meta_csv = split_audio(audio_path,book_caption,root='%s/wavs'%bookdir,sr=22050,buffer=1800,augmentation=args.augment,min_duration=args.min_duration,max_duration=args.max_duration)
                         mstatus.numchunks += "%d, "%len(meta_csv)
                         meta_csv = '\n'.join(['|'.join(tpl) for tpl in meta_csv])
                         meta_csv_data.append(meta_csv)
@@ -517,5 +517,7 @@ if __name__ == '__main__':
     parser.add_argument('--max_vid_per_book',default=2,help='max number of books to download per book')
     parser.add_argument('--trans_cache',required=True,help='transliteration cache')
     parser.add_argument('--augment',choices=['rand_step'],default=None,help='augmentation method')
+    parser.add_argument('--min_duration',default=5,type=int)
+    parser.add_argument('--max_duration',default=10,type=int)
     args=parser.parse_args()
     run(args)
