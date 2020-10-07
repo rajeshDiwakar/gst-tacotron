@@ -17,6 +17,8 @@ from tqdm import tqdm
 import time
 import re
 import argparse
+from pydub import AudioSegment
+
 # logging.basicConfig(level=logging.DEBUG)
 
 # sr=16000
@@ -33,6 +35,27 @@ def str2ms(time_str):
     m = re.match('([0-9]+):([0-9]+):([0-9]+).([0-9]+)',time_str)
     h,m,s,ms = m.group(1,2,3,4)
     return (int(h)*3600 + int(m)*60 + int(s))*1000+ int(ms)
+
+
+
+def detect_leading_silence(sound, silence_threshold=-50.0, chunk_size=10):
+    '''
+    sound is a pydub.AudioSegment
+    silence_threshold in dB
+    chunk_size in ms
+
+    iterate over chunks until you find the first one with sound
+    '''
+    trim_ms = 0 # ms
+
+    assert chunk_size > 0 # to avoid infinite loop
+    while sound[trim_ms:trim_ms+chunk_size].dBFS < silence_threshold and trim_ms < len(sound):
+        trim_ms += chunk_size
+
+    return trim_ms
+
+
+
 
 def split_audio(audio,caption,root,sr=22050,buffer=1800,augmentation=None,aug_factor=3,min_duration=1,max_duration=10,silence='0'):
     '''
@@ -132,7 +155,24 @@ def split_audio(audio,caption,root,sr=22050,buffer=1800,augmentation=None,aug_fa
         # audio = np.array(audio)
         # audio = audio / 32768.0
 
-        librosa.output.write_wav(clip_path, clip, sr)
+        # librosa.output.write_wav(clip_path, clip, sr)
+        librosa.output.write_wav('temp.wav', clip, sr)
+
+        # remove silence
+        sound = AudioSegment.from_file('temp.wav', format="wav")
+        margin = int(silence[0]) # in ms
+        start_trim = detect_leading_silence(sound)
+        end_trim = detect_leading_silence(sound.reverse())
+
+        start_trim = max(0,start_trim-margin)
+        end_trim = max(0,end_trim-margin)
+
+        duration = len(sound)
+        trimmed_sound = sound[start_trim:duration-end_trim]
+        trimmed_sound.export(clip_path,format='wav')
+
+        # new_p = os.path.join('wavs',f)
+
         meta.append((clip_path,text,text))
     meta_csv_path = os.path.join(root,'../meta.csv')
     meta = ['|'.join(tpl) for tpl in meta]
