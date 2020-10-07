@@ -1,8 +1,8 @@
 '''
 python split_audio.py \
   --audio jamendo/Avercage_-_Embers/Avercage_-_Embers_mono.wav \
-  --caption jamendo/Avercage_-_Embers/Avercage_-_Embers.json \
-  --data_dir jamendo/Avercage_-_Embers/Avercage_-_Embers_sil \
+  --caption jamendo/jsons/Avercage_-_Embers.json \
+  --data_dir jamendo/Avercage_-_Embers/wavs \
   --silence 50,50
 /home/rajesh/work/limbo/gst-tacotron/tools/jamendo/Avercage_-_Embers/Avercage_-_Embers.mp3
 '''
@@ -49,13 +49,12 @@ def split_audio(audio,caption,root,sr=22050,buffer=1800,augmentation=None,aug_fa
     lsilence=np.zeros(int(lsilence*sr//1000),dtype=np.int16)
     rsilence = np.zeros(int(rsilence*sr//1000),dtype=np.int16)
 
-    # count = 0
+    meta=[]
     offset = 0 # in ms
     frames = None
     basename = os.path.basename(audio)
     basename = os.path.splitext(basename)[0]
     if basename.endswith('_mono'): basename = basename[:-5]
-    print(basename)
     if augmentation:
         if augmentation == 'rand_step':
             words = [word for cap in captions for word in cap['words']]
@@ -134,6 +133,11 @@ def split_audio(audio,caption,root,sr=22050,buffer=1800,augmentation=None,aug_fa
         # audio = audio / 32768.0
 
         librosa.output.write_wav(clip_path, clip, sr)
+        meta.append((clip_path,text,text))
+    meta_csv_path = os.path.join(root,'../meta.csv')
+    meta = ['|'.join(tpl) for tpl in meta]
+    with open(meta_csv_path,'w',encoding='utf-8') as f:
+                    f.write('\n'.join(meta))
 
 
 if __name__ == '__main__':
@@ -148,7 +152,8 @@ if __name__ == '__main__':
         parser.add_argument('--silence',default='0',help='--silence=lsilence,rsilence in ms')
 
         args=parser.parse_args()
-        split_audio(args.audio,args.caption,args.data_dir,augmentation=args.augment,aug_factor=args.aug_factor,min_duration=args.min_duration,max_duration=args.max_duration,silence=args.silence)
+        split_audio(args.audio,args.caption,args.data_dir,augmentation=args.augment,aug_factor=args.aug_factor,
+                    min_duration=args.min_duration,max_duration=args.max_duration,silence=args.silence)
 
 
 #def split(wav,start,end):
