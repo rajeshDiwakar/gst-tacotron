@@ -115,7 +115,7 @@ def split_audio(audio,caption,root,sr=22050,buffer=1800,augmentation=None,aug_fa
     for cap in tqdm(aug_captions):
         # count += 1
         # if count >3: break
-        # if not cap['match']: continue
+        if not cap['match']: continue
         tstart = time.time()
         text = cap['text']
         start = cap['start']

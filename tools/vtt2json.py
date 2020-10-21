@@ -75,6 +75,7 @@ creates a tendency to stick to routines
 
     return target_path
 
+vtt2json = livevtt2json
 
 if __name__ == '__main__':
     if len(sys.argv)== 1:sys.argv.append('/home/rajesh/work/limbo/data/yt/audiobooks/Ikigai Audiobook full _ Hector Garcia and Francc Miralles.en.vtt')
