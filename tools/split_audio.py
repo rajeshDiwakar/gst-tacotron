@@ -196,7 +196,7 @@ if __name__ == '__main__':
         parser.add_argument('--min_duration',default=5,type=int)
         parser.add_argument('--max_duration',default=10,type=int)
         parser.add_argument('--silence',default='0',help='--silence=lsilence,rsilence in ms')
-        parser.add_argument('--margin',default=0,type=int,help='duration of audio before and after as safety margin(=100,100) will be in chunks in ms')
+        parser.add_argument('--margin',default='0',help='duration of audio before and after as safety margin(=100,100) will be in chunks in ms')
 
         args=parser.parse_args()
         split_audio(args.audio,args.caption,args.data_dir,augmentation=args.augment,aug_factor=args.aug_factor,
