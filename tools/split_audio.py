@@ -72,7 +72,7 @@ def split_audio(audio,caption,root,sr=22050,buffer=1800,augmentation=None,aug_fa
     lsilence=np.zeros(int(lsilence*sr//1000),dtype=np.int16)
     rsilence = np.zeros(int(rsilence*sr//1000),dtype=np.int16)
 
-    margin=margin.split(',')
+    margin=margin.split('_')
     if len(margin)>= 2:
         lmargin,rmargin = int(margin[0]),int(margin[1])
     else:
