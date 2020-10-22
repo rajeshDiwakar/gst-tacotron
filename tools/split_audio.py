@@ -57,7 +57,7 @@ def detect_leading_silence(sound, silence_threshold=-50.0, chunk_size=10):
 
 
 
-def split_audio(audio,caption,root,sr=22050,buffer=1800,augmentation=None,aug_factor=3,min_duration=1,max_duration=10,silence='0'):
+def split_audio(audio,caption,root,sr=22050,buffer=1800,augmentation=None,aug_factor=3,min_duration=1,max_duration=10,silence='0',margin=0):
     '''
     buffer: audio chunk in seconds to load to avoid multiple mem reads
     '''
@@ -122,8 +122,8 @@ def split_audio(audio,caption,root,sr=22050,buffer=1800,augmentation=None,aug_fa
         end = cap['end']
         if type(start) == str:
             startstr,endstr = start,end
-            start = str2ms(startstr)
-            end = str2ms(endstr)
+            start = max(0,str2ms(startstr)-margin)
+            end = str2ms(endstr)+margin
         else:
             startstr = ms2str(start)
             endstr = ms2str(end)
@@ -190,6 +190,7 @@ if __name__ == '__main__':
         parser.add_argument('--min_duration',default=5,type=int)
         parser.add_argument('--max_duration',default=10,type=int)
         parser.add_argument('--silence',default='0',help='--silence=lsilence,rsilence in ms')
+        parser.add_argument('--margin',default=0,type=int,help='duration of audio before and after as safety margin will be in chunks in ms')
 
         args=parser.parse_args()
         split_audio(args.audio,args.caption,args.data_dir,augmentation=args.augment,aug_factor=args.aug_factor,
