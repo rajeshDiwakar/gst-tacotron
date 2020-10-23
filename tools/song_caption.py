@@ -58,7 +58,7 @@ def clean_lyrics(text):
     for c in emphasis:
         text  = re.sub(c,emphasis[c],text)
     text = re.sub("[^a-zA-Z0-9-' \n]",'',text)
-    text = re.sub('\s+',' ',text)
+    text = re.sub(' +',' ',text)
     text = re.sub('\n+','\n',text)
 
     return text
@@ -104,6 +104,7 @@ def align_text(text_path, caption_path, new_caption_path=None,debug=False):
     # text = clean_text(text)
     # remove emphasis chars
     text = clean_lyrics(text)
+    lyricslen = len(text)
     doc = nlp(text[:100000])
     position = [token.i for token in doc if token.i!=0 and "'" in token.text]
     with doc.retokenize() as retokenizer:
@@ -400,7 +401,7 @@ def align_text(text_path, caption_path, new_caption_path=None,debug=False):
         # print('\nPrinting continuous text')
         # for block in continuous_texts:
         #     print(' '.join(text_words[block[0][1]:block[-1][1]+1]))
-        print('Match Percentage: %.2f'%(len(' '.join([cap['text'] for cap in aligned_captions]))/len(text)) )
+        print('Match Percentage: %.2f'%(100*len(' '.join([cap['text'] for cap in aligned_captions]))/lyricslen) )
 
         if not new_caption_path:
             new_caption_path = os.path.splitext(caption_path)[0]+'_aligned.json'
